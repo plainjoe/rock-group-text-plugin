@@ -1,0 +1,32 @@
+# Build outputs
+bin/
+obj/
+artifacts/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# NuGet
+packages/
+*.nupkg
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Rock DLLs in lib folder (downloaded during CI)
+lib/*.dll
+
+# Temporary files
+*.tmp
+*.temp
+rock-temp/
+rock.zip

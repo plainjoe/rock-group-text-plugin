@@ -1,0 +1,83 @@
+name: Build Plugin
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v2
+
+    - name: Download Rock Dependencies
+      shell: pwsh
+      run: |
+        # Download Rock RMS release and extract required DLLs
+        $rockVersion = "16.13.0"
+        $downloadUrl = "https://github.com/SparkDevNetwork/Rock/releases/download/v$rockVersion/RockWeb-$rockVersion.zip"
+
+        Write-Host "Downloading Rock v$rockVersion..."
+        Invoke-WebRequest -Uri $downloadUrl -OutFile "rock.zip"
+
+        Write-Host "Extracting required DLLs..."
+        Expand-Archive -Path "rock.zip" -DestinationPath "rock-temp" -Force
+
+        # Copy required DLLs to lib folder
+        $dllsToCopy = @(
+          "Rock.dll",
+          "Rock.Common.dll",
+          "EntityFramework.dll",
+          "EntityFramework.SqlServer.dll"
+        )
+
+        foreach ($dll in $dllsToCopy) {
+          $sourcePath = "rock-temp/bin/$dll"
+          if (Test-Path $sourcePath) {
+            Copy-Item $sourcePath -Destination "lib/" -Force
+            Write-Host "Copied $dll"
+          } else {
+            Write-Warning "Could not find $dll"
+          }
+        }
+
+        # Cleanup
+        Remove-Item "rock.zip" -Force
+        Remove-Item "rock-temp" -Recurse -Force
+
+    - name: Restore NuGet packages
+      run: nuget restore com.plainjoe.GroupText.csproj
+
+    - name: Build
+      run: msbuild com.plainjoe.GroupText.csproj /p:Configuration=Release /p:Platform="AnyCPU"
+
+    - name: Prepare Artifacts
+      shell: pwsh
+      run: |
+        New-Item -ItemType Directory -Path "artifacts/bin" -Force
+        New-Item -ItemType Directory -Path "artifacts/Plugins/com_plainjoe/GroupText" -Force
+
+        # Copy compiled DLL
+        Copy-Item "bin/Release/com.plainjoe.GroupText.dll" -Destination "artifacts/bin/"
+
+        # Copy block files
+        Copy-Item "Blocks/*.ascx" -Destination "artifacts/Plugins/com_plainjoe/GroupText/"
+        Copy-Item "Blocks/*.ascx.cs" -Destination "artifacts/Plugins/com_plainjoe/GroupText/"
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: GroupTextPlugin
+        path: artifacts/
+        retention-days: 30
