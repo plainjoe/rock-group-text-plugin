@@ -22,8 +22,7 @@ packages/
 .DS_Store
 Thumbs.db
 
-# Rock DLLs in lib folder (downloaded during CI)
-lib/*.dll
+# Keep Rock DLLs in lib folder (committed to repo)
 
 # Temporary files
 *.tmp

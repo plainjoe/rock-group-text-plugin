@@ -21,43 +21,25 @@ jobs:
     - name: Setup NuGet
       uses: NuGet/setup-nuget@v2
 
-    - name: Download Rock Dependencies
+    - name: Verify Rock Dependencies
       shell: pwsh
       run: |
-        # Download Rock RMS release and extract required DLLs
-        $rockVersion = "16.13.0"
-        $downloadUrl = "https://github.com/SparkDevNetwork/Rock/releases/download/v$rockVersion/RockWeb-$rockVersion.zip"
+        $requiredDlls = @("Rock.dll", "Rock.Common.dll", "EntityFramework.dll")
+        $missing = @()
 
-        Write-Host "Downloading Rock v$rockVersion..."
-        Invoke-WebRequest -Uri $downloadUrl -OutFile "rock.zip"
-
-        Write-Host "Extracting required DLLs..."
-        Expand-Archive -Path "rock.zip" -DestinationPath "rock-temp" -Force
-
-        # Copy required DLLs to lib folder
-        $dllsToCopy = @(
-          "Rock.dll",
-          "Rock.Common.dll",
-          "EntityFramework.dll",
-          "EntityFramework.SqlServer.dll"
-        )
-
-        foreach ($dll in $dllsToCopy) {
-          $sourcePath = "rock-temp/bin/$dll"
-          if (Test-Path $sourcePath) {
-            Copy-Item $sourcePath -Destination "lib/" -Force
-            Write-Host "Copied $dll"
-          } else {
-            Write-Warning "Could not find $dll"
+        foreach ($dll in $requiredDlls) {
+          if (-not (Test-Path "lib/$dll")) {
+            $missing += $dll
           }
         }
 
-        # Cleanup
-        Remove-Item "rock.zip" -Force
-        Remove-Item "rock-temp" -Recurse -Force
+        if ($missing.Count -gt 0) {
+          Write-Error "Missing required DLLs in lib folder: $($missing -join ', ')"
+          Write-Error "Please copy these DLLs from your Rock installation's bin folder."
+          exit 1
+        }
 
-    - name: Restore NuGet packages
-      run: nuget restore com.plainjoe.GroupText.csproj
+        Write-Host "All required dependencies found in lib folder."
 
     - name: Build
       run: msbuild com.plainjoe.GroupText.csproj /p:Configuration=Release /p:Platform="AnyCPU"
