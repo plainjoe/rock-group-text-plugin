@@ -273,7 +273,7 @@ namespace RockWeb.Plugins.com_plainjoe.GroupText
                     FutureSendDateTime = null,
                     Subject = $"Group Text Message - {RockDateTime.Now:g}",
                     SMSMessage = message,
-                    SMSFromDefinedValueId = fromNumber.AssignedToDefinedValueId
+                    SmsFromSystemPhoneNumberId = fromNumber.Id
                 };
 
                 communicationService.Add( communication );
@@ -297,7 +297,11 @@ namespace RockWeb.Plugins.com_plainjoe.GroupText
                 rockContext.SaveChanges();
 
                 // Queue the communication for sending
-                Rock.Tasks.ProcessSendCommunication.Execute( communication.Id );
+                var sendMessage = new Rock.Tasks.ProcessSendCommunication.Message
+                {
+                    CommunicationId = communication.Id
+                };
+                Rock.Tasks.ProcessSendCommunication.Execute( sendMessage );
 
                 result.Success = true;
                 result.RecipientCount = communication.Recipients.Count;
