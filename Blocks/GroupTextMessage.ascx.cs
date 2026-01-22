@@ -298,8 +298,12 @@ namespace RockWeb.Plugins.com_plainjoe.GroupText
 
                 rockContext.SaveChanges();
 
-                // Send the communication asynchronously
-                CommunicationService.SendAsync( communication );
+                // Send the communication using Rock's message bus
+                var sendMessage = new Rock.Tasks.ProcessSendCommunication.Message
+                {
+                    CommunicationId = communication.Id
+                };
+                sendMessage.SendAsync();
 
                 result.Success = true;
                 result.RecipientCount = communication.Recipients.Count;

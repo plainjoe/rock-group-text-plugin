@@ -2,7 +2,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle( "com.plainjoe.GroupText" )]
-[assembly: AssemblyDescription( "A Rock RMS plugin for sending SMS text messages to group members." )]
+[assembly: AssemblyDescription( "A Rock RMS plugin for sending SMS text messages to group members. Targets Rock 17.6+." )]
 [assembly: AssemblyConfiguration( "" )]
 [assembly: AssemblyCompany( "Plain Joe Studios" )]
 [assembly: AssemblyProduct( "com.plainjoe.GroupText" )]
