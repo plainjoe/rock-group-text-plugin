@@ -24,7 +24,7 @@ jobs:
     - name: Verify Rock Dependencies
       shell: pwsh
       run: |
-        $requiredDlls = @("Rock.dll", "Rock.Common.dll", "EntityFramework.dll")
+        $requiredDlls = @("Rock.dll", "Rock.Common.dll", "Rock.Enums.dll", "EntityFramework.dll")
         $missing = @()
 
         foreach ($dll in $requiredDlls) {

@@ -49,6 +49,10 @@
       <HintPath>lib\Rock.Common.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Rock.Enums">
+      <HintPath>lib\Rock.Enums.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />

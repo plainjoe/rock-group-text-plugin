@@ -4,11 +4,13 @@ using System.ComponentModel;
 using System.Data.Entity;
 using System.Linq;
 using System.Web.UI;
+using System.Web.UI.WebControls;
 
 using Rock;
 using Rock.Attribute;
 using Rock.Communication;
 using Rock.Data;
+using Rock.Enums.Group;
 using Rock.Model;
 using Rock.Security;
 using Rock.Web.Cache;
@@ -42,6 +44,22 @@ namespace RockWeb.Plugins.com_plainjoe.GroupText
 
     public partial class GroupTextMessage : RockBlock
     {
+        #region Control Declarations
+
+        protected UpdatePanel upnlContent;
+        protected Panel pnlView;
+        protected NotificationBox nbWarning;
+        protected NotificationBox nbSuccess;
+        protected Panel pnlEntry;
+        protected GroupPicker gpGroup;
+        protected Panel pnlGroupInfo;
+        protected Literal lMemberCount;
+        protected Literal lMobileCount;
+        protected RockTextBox tbMessage;
+        protected BootstrapButton btnSend;
+
+        #endregion
+
         #region Attribute Keys
 
         private static class AttributeKey
