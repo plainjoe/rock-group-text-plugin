@@ -269,8 +269,8 @@ namespace RockWeb.Plugins.com_plainjoe.GroupText
                     ReviewerPersonAliasId = CurrentPersonAliasId,
                     SenderPersonAliasId = CurrentPersonAliasId,
                     CommunicationType = CommunicationType.SMS,
-                    SMSMessage = message,
-                    SMSFromSystemPhoneNumberId = fromNumber.Id,
+                    SmsMessage = message,
+                    SmsFromSystemPhoneNumberId = fromNumber.Id,
                     IsBulkCommunication = true,
                     FutureSendDateTime = null,
                     Subject = $"Group Text Message - {RockDateTime.Now:g}"
@@ -296,15 +296,11 @@ namespace RockWeb.Plugins.com_plainjoe.GroupText
 
                 rockContext.SaveChanges();
 
-                // Send the communication
-                var sendCommunication = true;
-                if ( sendCommunication )
+                // Send the communication using the ProcessSendCommunication task
+                new Rock.Tasks.ProcessSendCommunication.Message
                 {
-                    var transaction = new Rock.Transactions.SendCommunicationTransaction();
-                    transaction.CommunicationId = communication.Id;
-                    transaction.PersonAlias = CurrentPersonAlias;
-                    Rock.Transactions.RockQueue.TransactionQueue.Enqueue( transaction );
-                }
+                    CommunicationId = communication.Id
+                }.Send();
 
                 result.Success = true;
                 result.RecipientCount = communication.Recipients.Count;
