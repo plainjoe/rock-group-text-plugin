@@ -301,7 +301,7 @@ namespace RockWeb.Plugins.com_plainjoe.GroupText
                 {
                     CommunicationId = communication.Id
                 };
-                Rock.Tasks.ProcessSendCommunication.Execute( sendMessage );
+                new Rock.Tasks.ProcessSendCommunication().Execute( sendMessage );
 
                 result.Success = true;
                 result.RecipientCount = communication.Recipients.Count;
